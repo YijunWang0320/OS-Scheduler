@@ -39,6 +39,8 @@
 #define SCHED_BATCH		3
 /* SCHED_ISO: reserved but not implemented yet */
 #define SCHED_IDLE		5
+/*team10: add sched_grr as 6*/
+#define SCHED_GRR       6
 /* Can be ORed in to make sure the process is reverted back to SCHED_NORMAL on fork */
 #define SCHED_RESET_ON_FORK     0x40000000
 
@@ -1248,6 +1250,11 @@ struct sched_rt_entity {
 #endif
 };
 
+/*team10: define sched_grr_entity*/
+struct sched_grr_entity{
+
+};
+
 /*
  * default timeslice is 100 msecs (used only for SCHED_RR tasks).
  * Timeslices get refilled after they expire.
@@ -1281,6 +1288,9 @@ struct task_struct {
 	const struct sched_class *sched_class;
 	struct sched_entity se;
 	struct sched_rt_entity rt;
+
+	/* team10: add grr entity to each process*/
+	struct sched_grr_entity grr;
 
 #ifdef CONFIG_PREEMPT_NOTIFIERS
 	/* list of struct preempt_notifier: */
