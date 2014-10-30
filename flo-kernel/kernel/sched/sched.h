@@ -79,6 +79,8 @@ extern struct mutex sched_domains_mutex;
 
 struct cfs_rq;
 struct rt_rq;
+/*team10: delcare grr_rq*/
+struct grr_rq;
 
 static LIST_HEAD(task_groups);
 
@@ -311,6 +313,10 @@ struct rt_rq {
 #endif
 };
 
+/*team10: define grr runqueue*/
+struct grr_rq {
+};
+
 #ifdef CONFIG_SMP
 
 /*
@@ -372,6 +378,7 @@ struct rq {
 
 	struct cfs_rq cfs;
 	struct rt_rq rt;
+	struct grr_rq;
 
 #ifdef CONFIG_FAIR_GROUP_SCHED
 	/* list of leaf cfs_rq on this cpu: */
@@ -857,7 +864,8 @@ extern const struct sched_class stop_sched_class;
 extern const struct sched_class rt_sched_class;
 extern const struct sched_class fair_sched_class;
 extern const struct sched_class idle_sched_class;
-
+/*team10: delcare grr sched class*/
+extern const struct sched_class grr_sched_class;
 
 #ifdef CONFIG_SMP
 
@@ -1155,6 +1163,8 @@ extern void print_rt_stats(struct seq_file *m, int cpu);
 
 extern void init_cfs_rq(struct cfs_rq *cfs_rq);
 extern void init_rt_rq(struct rt_rq *rt_rq, struct rq *rq);
+/*team10: add init_grr_rq*/
+extern void init_grr_rq(struct grr_rq *grr_rq, struct re *rq);
 extern void unthrottle_offline_cfs_rqs(struct rq *rq);
 
 extern void account_cfs_bandwidth_used(int enabled, int was_enabled);
