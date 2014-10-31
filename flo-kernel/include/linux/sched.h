@@ -1235,6 +1235,11 @@ struct sched_entity {
 };
 
 struct sched_rt_entity {
+	struct load_weight	load;		/* for load-balancing */
+	struct rb_node		run_node;
+	struct list_head	group_node;
+	unsigned int		on_rq;
+
 	struct list_head run_list;
 	unsigned long timeout;
 	unsigned int time_slice;
@@ -1252,32 +1257,6 @@ struct sched_rt_entity {
 
 /*team10: define sched_grr_entity*/
 struct sched_grr_entity{
-	/* copy from sched_entity*/
-	struct load_weight	load;		/* for load-balancing */
-	struct rb_node		run_node;
-	struct list_head	group_node;
-	unsigned int		on_rq;
-
-	u64			exec_start;
-	u64			sum_exec_runtime;
-	u64			vruntime;
-	u64			prev_sum_exec_runtime;
-
-	u64			nr_migrations;
-
-#ifdef CONFIG_SCHEDSTATS
-	struct sched_statistics statistics;
-#endif
-
-#ifdef CONFIG_FAIR_GROUP_SCHED
-	struct sched_entity	*parent;
-	/* rq on which this entity is (to be) queued: */
-	struct cfs_rq		*cfs_rq;
-	/* rq "owned" by this entity/group: */
-	struct cfs_rq		*my_q;
-#endif
-
-	/*copy from shced_rt_entity*/
 	struct list_head run_list;
 	unsigned long timeout;
 	unsigned int time_slice;
@@ -1291,7 +1270,6 @@ struct sched_grr_entity{
 	/* rq "owned" by this entity/group: */
 	struct rt_rq		*my_q;
 #endif
-
 };
 
 /*
