@@ -4,7 +4,6 @@
 #include <linux/spinlock.h>
 #include <linux/stop_machine.h>
 
-#include "grr.c"
 #include "cpupri.h"
 
 extern __read_mostly int scheduler_running;
