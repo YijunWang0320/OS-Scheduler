@@ -2,10 +2,13 @@
  * Multicore Round Robin Scheduling Class (mapped to the SCHED_GRR
  * policy)
  */
+#include "sched.h"
 
+#include <linux/slab.h>
 
 static void enqueue_task_grr(struct rq *rq, struct task_struct *p, int wakeup)
 {
+
 }
 
 static void dequeue_task_grr(struct rq *rq, struct task_struct *p, int sleep)
@@ -21,7 +24,7 @@ static void requeue_task_grr(struct rq *rq, struct task_struct *p, int head)
 }
 
 static void init_grr_rq(struct grr_rq *grr_rq, struct re *rq) {
-	
+
 }
 static void yield_task_grr(struct rq *rq)
 {
@@ -50,13 +53,11 @@ load_balance_grr(struct rq *this_rq, int this_cpu, struct rq *busiest,
                 struct sched_domain *sd, enum cpu_idle_type idle,
                 int *all_pinned, int *this_best_prio)
 {
-        /* don't touch WRR tasks */
+        /* don't touch GRR tasks */
         return 0;
 }
 
-static int
-move_one_task_grr(struct rq *this_rq, int this_cpu, struct rq *busiest,
-                 struct sched_domain *sd, enum cpu_idle_type idle)
+static int move_one_task_grr(struct rq *this_rq, int this_cpu, struct rq *busiest, struct sched_domain *sd, enum cpu_idle_type idle)
 {
         return 0;
 }
@@ -84,15 +85,11 @@ unsigned int get_rr_interval_grr(struct task_struct *task)
         else
                 return 0;
 }
-/* added by Jia Rao: No preemption, so we leave this function empty */
-static void prio_changed_grr(struct rq *rq, struct task_struct *p,
-                              int oldprio, int running)
-{
+
+static void prio_changed_grr(struct rq *rq, struct task_struct *p, int oldprio, int running) {
 }
 
-static void switched_to_grr(struct rq *rq, struct task_struct *p,
-                           int running)
-{
+static void switched_to_grr(struct rq *rq, struct task_struct *p, int running) {
 }
 
 static const struct sched_class grr_sched_class = {
