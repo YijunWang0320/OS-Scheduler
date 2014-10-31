@@ -143,7 +143,7 @@ static void task_move_group_grr(struct task_struct *p, int on_rq)
 
 }
 
-static const struct sched_class grr_sched_class = {
+const struct sched_class grr_sched_class = {
 	.next			= &fair_sched_class,
 	.enqueue_task		= enqueue_task_grr,
 	.dequeue_task		= dequeue_task_grr,
