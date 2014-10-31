@@ -314,7 +314,9 @@ struct rt_rq {
 };
 
 /*team10: define grr runqueue*/
-struct grr_rq {
+struct grr_rq 
+{
+
 };
 
 #ifdef CONFIG_SMP
