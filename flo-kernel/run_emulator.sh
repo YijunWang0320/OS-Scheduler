@@ -1,0 +1,1 @@
+emulator -avd team10 -kernel arch/arm/boot/zImage -show-kernel

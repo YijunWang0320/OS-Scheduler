@@ -6,11 +6,13 @@
 
 #include <linux/slab.h>
 
+/*TODO*/
 static void enqueue_task_grr(struct rq *rq, struct task_struct *p, int wakeup)
 {
 
 }
 
+/*TODO*/
 static void dequeue_task_grr(struct rq *rq, struct task_struct *p, int sleep)
 {
 }
@@ -23,7 +25,7 @@ static void check_preempt_curr_grr(struct rq *rq, struct task_struct *p, int fla
 static struct task_struct *pick_next_task_grr(struct rq *rq)
 {
 }
-
+/*TODO*/
 static void put_prev_task_grr(struct rq *rq, struct task_struct *p)
 {
 }
@@ -72,6 +74,7 @@ static void set_curr_task_grr(struct rq *rq)
 	p->se.exec_start = rq->clock;
 }
 
+/*TODO*/
 static void task_tick_grr(struct rq *rq, struct task_struct *curr, int queued)
 {
 	struct grr_rq *grr_rq;
@@ -83,7 +86,17 @@ static void task_tick_grr(struct rq *rq, struct task_struct *curr, int queued)
 	}
 }
 
-static void task_fork(struct task_struct *p)
+static void task_fork_grr(struct task_struct *p)
+{
+
+}
+
+static void switched_from_grr(struct rq *this_rq, struct task_struct *task)
+{
+
+}
+
+static void switched_to_grr(struct rq *this_rq, struct task_struct *task)
 {
 
 }
@@ -103,6 +116,11 @@ static void prio_changed_grr(struct rq *rq, struct task_struct *p, int oldprio, 
 }
 
 static void switched_to_grr(struct rq *rq, struct task_struct *p, int running) {
+}
+
+static void task_move_group_grr(struct task_struct *p, int on_rq)
+{
+
 }
 
 static const struct sched_class grr_sched_class = {
