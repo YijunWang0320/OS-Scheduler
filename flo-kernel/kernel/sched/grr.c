@@ -4,8 +4,6 @@
  */
 #include "sched.h"
 
-#include <linux/slab.h>
-
 /*TODO*/
 static void enqueue_task_grr(struct rq *rq, struct task_struct *p, int wakeup)
 {
@@ -75,14 +73,36 @@ static void set_curr_task_grr(struct rq *rq)
 }
 
 /*TODO*/
-static void task_tick_grr(struct rq *rq, struct task_struct *curr, int queued)
+static void task_tick_grr(struct rq *rq, struct task_struct *p, int queued)
 {
-	struct grr_rq *grr_rq;
-	struct sched_grr_entity *grr_se = &curr->grr_se;
+	struct sched_grr_entity *grr_se = &p->grr;
 
-	for_each_sched_entity(grr_se) {
-		grr_rq = cfs_rq_of(grr_se);
-		entity_tick(grr_rq, grr_se, queued);
+	update_curr_rt(rq);
+
+	watchdog(rq, p);
+
+	/*
+	 * RR tasks need a special form of timeslice management.
+	 * FIFO tasks have no timeslices.
+	 */
+	if (p->policy != SCHED_RR)
+		return;
+
+	if (--p->rt.time_slice)
+		return;
+
+	p->rt.time_slice = RR_TIMESLICE;
+
+	/*
+	 * Requeue to the end of queue if we (and all of our ancestors) are the
+	 * only element on the queue
+	 */
+	for_each_sched_rt_entity(rt_se) {
+		if (rt_se->run_list.prev != rt_se->run_list.next) {
+			requeue_task_rt(rq, p, 0);
+			set_tsk_need_resched(p);
+			return;
+		}
 	}
 }
 
