@@ -1257,6 +1257,11 @@ struct sched_rt_entity {
 
 /*team10: define sched_grr_entity*/
 struct sched_grr_entity{
+	struct load_weight	load;		/* for load-balancing */
+	struct rb_node		run_node;
+	struct list_head	group_node;
+	unsigned int		on_rq;
+
 	struct list_head run_list;
 	unsigned long timeout;
 	unsigned int time_slice;
