@@ -4,79 +4,7 @@
  */
 #include "sched.h"
 
-
-#define for_each_sched_rt_entity(rt_se) \
-	for (; rt_se; rt_se = rt_se->parent)
-
-
-static inline int on_grr_rq(struct sched_grr_entity *grr_se)
-{
-	return !list_empty(&grr_se->run_list);
-}
-
-/*
- * Update the current task's runtime statistics. Skip current tasks that
- * are not in our scheduling class.
- */
-static void update_curr_rt(struct rq *rq)
-{
-	struct task_struct *curr = rq->curr;
-	struct sched_rt_entity *rt_se = &curr->rt;
-	struct rt_rq *rt_rq = rt_rq_of_se(rt_se);
-	u64 delta_exec;
-
-	if (curr->sched_class != &rt_sched_class)
-		return;
-
-	delta_exec = rq->clock_task - curr->se.exec_start;
-	if (unlikely((s64)delta_exec < 0))
-		delta_exec = 0;
-
-	schedstat_set(curr->se.statistics.exec_max,
-		      max(curr->se.statistics.exec_max, delta_exec));
-
-	curr->se.sum_exec_runtime += delta_exec;
-	account_group_exec_runtime(curr, delta_exec);
-
-	curr->se.exec_start = rq->clock_task;
-	cpuacct_charge(curr, delta_exec);
-
-	sched_rt_avg_update(rq, delta_exec);
-
-	if (!rt_bandwidth_enabled())
-		return;
-
-	for_each_sched_rt_entity(rt_se) {
-		rt_rq = rt_rq_of_se(rt_se);
-
-		if (sched_rt_runtime(rt_rq) != RUNTIME_INF) {
-			raw_spin_lock(&rt_rq->rt_runtime_lock);
-			rt_rq->rt_time += delta_exec;
-			if (sched_rt_runtime_exceeded(rt_rq))
-				resched_task(curr);
-			raw_spin_unlock(&rt_rq->rt_runtime_lock);
-		}
-	}
-}
-
-static void watchdog(struct rq *rq, struct task_struct *p)
-{
-	unsigned long soft, hard;
-
-	/* max may change after cur was read, this will be fixed next tick */
-	soft = task_rlimit(p, RLIMIT_RTTIME);
-	hard = task_rlimit_max(p, RLIMIT_RTTIME);
-
-	if (soft != RLIM_INFINITY) {
-		unsigned long next;
-
-		p->rt.timeout++;
-		next = DIV_ROUND_UP(min(soft, hard), USEC_PER_SEC/HZ);
-		if (p->rt.timeout > next)
-			p->cputime_expires.sched_exp = p->se.sum_exec_runtime;
-	}
-}
-
+#include <linux/slab.h>
 
 /*TODO*/
 static void enqueue_task_grr(struct rq *rq, struct task_struct *p, int wakeup)
@@ -128,15 +56,6 @@ static int move_one_task_grr(struct rq *this_rq, int this_cpu, struct rq *busies
 
 static void requeue_grr_entity(struct grr_rq *grr_rq, struct sched_grr_entity *grr_se, int head)
 {
-		if (on_rt_rq(rt_se)) {
-		struct rt_prio_array *array = &rt_rq->active;
-		struct list_head *queue = array->queue + rt_se_prio(rt_se);
-
-		if (head)
-			list_move(&rt_se->run_list, queue);
-		else
-			list_move_tail(&rt_se->run_list, queue);
-	}
 }
 
 static void requeue_task_grr(struct rq *rq, struct task_struct *p, int head)
@@ -156,36 +75,14 @@ static void set_curr_task_grr(struct rq *rq)
 }
 
 /*TODO*/
-static void task_tick_grr(struct rq *rq, struct task_struct *p, int queued)
+static void task_tick_grr(struct rq *rq, struct task_struct *curr, int queued)
 {
-	struct sched_rt_entity *rt_se = &p->rt;
+	struct grr_rq *grr_rq;
+	struct sched_grr_entity *grr_se = &curr->grr_se;
 
-	update_curr_rt(rq);
-
-	watchdog(rq, p);
-
-	/*
-	 * RR tasks need a special form of timeslice management.
-	 * FIFO tasks have no timeslices.
-	 */
-	if (p->policy != SCHED_RR)
-		return;
-
-	if (--p->rt.time_slice)
-		return;
-
-	p->rt.time_slice = RR_TIMESLICE;
-
-	/*
-	 * Requeue to the end of queue if we (and all of our ancestors) are the
-	 * only element on the queue
-	 */
-	for_each_sched_rt_entity(rt_se) {
-		if (rt_se->run_list.prev != rt_se->run_list.next) {
-			requeue_task_grr(rq, p, 0);
-			set_tsk_need_resched(p);
-			return;
-		}
+	for_each_sched_entity(grr_se) {
+		grr_rq = cfs_rq_of(grr_se);
+		entity_tick(grr_rq, grr_se, queued);
 	}
 }
 
@@ -226,9 +123,9 @@ static void task_move_group_grr(struct task_struct *p, int on_rq)
 
 }
 
-const struct sched_class grr_sched_class = {
+static const struct sched_class grr_sched_class = {
 	.next			= &fair_sched_class,
-	.enqueue_task		= enqueue_task_rt,
+	.enqueue_task		= enqueue_task_grr,
 	.dequeue_task		= dequeue_task_grr,
 	.yield_task		= yield_task_grr,
 
