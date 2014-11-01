@@ -62,7 +62,7 @@ static void requeue_task_grr(struct rq *rq, struct task_struct *p, int head)
 {
 }
 
-static void init_grr_rq(struct grr_rq *grr_rq, struct re *rq) {
+void init_grr_rq(struct grr_rq *grr_rq, struct re *rq) {
 
 }
 
@@ -136,8 +136,6 @@ const struct sched_class grr_sched_class = {
 
 #ifdef CONFIG_SMP
 	.select_task_rq		= select_task_rq_grr,
-
-	.load_balance		= load_balance_grr,
 	.move_one_task		= move_one_task_grr,
 #endif
 
