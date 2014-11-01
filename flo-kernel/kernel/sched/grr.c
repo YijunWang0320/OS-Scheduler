@@ -6,25 +6,22 @@
 
 #include <linux/slab.h>
 
-/*TODO*/
 static void enqueue_task_grr(struct rq *rq, struct task_struct *p, int wakeup)
 {
 	p->task_time_slice = RR_TIMESLICE;
-	list_add_tail( &p->grr.run_list, &rq->grr.queue);
+	list_add_tail(&p->grr.run_list, &rq->grr.queue);
 	rq->grr.nr_running++;
 }
 
-/*TODO*/
 static void dequeue_task_grr(struct rq *rq, struct task_struct *p, int sleep)
 {
-
 	update_curr_other_rr(rq);
 	list_del(&p->grr.run_list);
 	rq->grr.nr_running--;
-
 }
 static void yield_task_grr(struct rq *rq)
 {
+	
 }
 static void check_preempt_curr_grr(struct rq *rq, struct task_struct *p, int flags)
 {
