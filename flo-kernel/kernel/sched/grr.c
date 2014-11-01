@@ -62,7 +62,7 @@ static void requeue_task_grr(struct rq *rq, struct task_struct *p, int head)
 {
 }
 
-void init_grr_rq(struct grr_rq *grr_rq, struct re *rq) {
+void init_grr_rq(struct grr_rq *grr_rq, struct rq *rq) {
 
 }
 
