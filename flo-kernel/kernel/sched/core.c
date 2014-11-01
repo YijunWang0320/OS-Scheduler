@@ -1740,6 +1740,8 @@ static void __sched_fork(struct task_struct *p)
 #ifdef CONFIG_PREEMPT_NOTIFIERS
 	INIT_HLIST_HEAD(&p->preempt_notifiers);
 #endif
+	INIT_LIST_HEAD(&p->grr.run_list);
+	p->grr.time_slice = RR_TIMESLICE;
 }
 
 /*
