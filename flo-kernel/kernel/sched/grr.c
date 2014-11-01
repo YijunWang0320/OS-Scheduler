@@ -79,7 +79,7 @@ static void requeue_grr_entity(struct grr_rq *grr_rq, struct sched_grr_entity *g
 
 }
 
-static void init_grr_rq(struct grr_rq *grr_rq, struct re *rq) {
+static void init_grr_rq(struct grr_rq *grr_rq, struct rq *rq) {
 
 }
 
@@ -112,11 +112,6 @@ static void task_fork_grr(struct task_struct *p)
 
 }
 
-static void switched_from_grr(struct rq *this_rq, struct task_struct *task)
-{
-
-}
-
 static void switched_to_grr(struct rq *this_rq, struct task_struct *task)
 {
 
@@ -128,7 +123,7 @@ unsigned int get_rr_interval_grr(struct task_struct *task)
  *          * Time slice is 0 for SCHED_FIFO tasks
  *                   */
         if (task->policy == SCHED_GRR)
-                return DEF_TIMESLICE;
+                return RR_TIMESLICE;
         else
                 return 0;
 }
