@@ -100,15 +100,12 @@ unsigned int get_rr_interval_grr(struct task_struct *task)
  *          * Time slice is 0 for SCHED_FIFO tasks
  *                   */
         if (task->policy == SCHED_GRR)
-                return DEF_TIMESLICE;
+                return RR_TIMESLICE;
         else
                 return 0;
 }
 
 static void prio_changed_grr(struct rq *rq, struct task_struct *p, int oldprio, int running) {
-}
-
-static void switched_to_grr(struct rq *rq, struct task_struct *p, int running) {
 }
 
 static void task_move_group_grr(struct task_struct *p, int on_rq)
