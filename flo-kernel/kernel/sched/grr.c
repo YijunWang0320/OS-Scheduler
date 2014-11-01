@@ -79,7 +79,7 @@ static void requeue_grr_entity(struct grr_rq *grr_rq, struct sched_grr_entity *g
 
 }
 
-static void init_grr_rq(struct grr_rq *grr_rq, struct rq *rq) {
+void init_grr_rq(struct grr_rq *grr_rq, struct rq *rq) {
 
 }
 
@@ -108,11 +108,6 @@ static void task_tick_grr(struct rq *rq, struct task_struct *curr, int queued)
 }
 
 static void task_fork_grr(struct task_struct *p)
-{
-
-}
-
-static void switched_to_grr(struct rq *this_rq, struct task_struct *task)
 {
 
 }
