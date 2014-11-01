@@ -8,10 +8,16 @@
 
 static void enqueue_task_grr(struct rq *rq, struct task_struct *p, int wakeup)
 {
-	p->task_time_slice = RR_TIMESLICE;
+	p->grr.time_slice = RR_TIMESLICE;
 	list_add_tail(&p->grr.run_list, &rq->grr.queue);
 	rq->grr.nr_running++;
 }
+
+static void requeue_task_grr(struct rq *rq, struct task_struct *p)
+{
+	list_move_tail(&p->grr.run_list,&rq->grr.queue);
+}
+
 static void yield_task_grr(struct rq *rq)
 {
 	printk("yield_task %ld\n",(unsigned long int)rq->curr);
@@ -19,7 +25,7 @@ static void yield_task_grr(struct rq *rq)
 }
 static void dequeue_task_grr(struct rq *rq, struct task_struct *p, int sleep)
 {
-	update_curr_other_rr(rq);
+	/* update_curr_other_rr(rq); */
 	list_del(&p->grr.run_list);
 	rq->grr.nr_running--;
 }
@@ -28,7 +34,7 @@ static void check_preempt_curr_grr(struct rq *rq, struct task_struct *p, int fla
 }
 static struct task_struct *pick_next_task_grr(struct rq *rq)
 {
-	struct sched_rt_entity *temp_next;
+	struct sched_grr_entity *temp_next;
 	struct task_struct *next;
 
 	next = NULL;
@@ -73,12 +79,7 @@ static void requeue_grr_entity(struct grr_rq *grr_rq, struct sched_grr_entity *g
 
 }
 
-static void requeue_task_grr(struct rq *rq, struct task_struct *p, int head)
-{
-	list_move_tail(&p->grr.run_list,&rq->grr.queue);
-}
-
-static void init_grr_rq(struct grr_rq *grr_rq, struct re *rq) {
+void init_grr_rq(struct grr_rq *grr_rq, struct rq *rq) {
 
 }
 
@@ -111,23 +112,13 @@ static void task_fork_grr(struct task_struct *p)
 
 }
 
-static void switched_from_grr(struct rq *this_rq, struct task_struct *task)
-{
-
-}
-
-static void switched_to_grr(struct rq *this_rq, struct task_struct *task)
-{
-
-}
-
 unsigned int get_rr_interval_grr(struct task_struct *task)
 {
         /*
  *          * Time slice is 0 for SCHED_FIFO tasks
  *                   */
         if (task->policy == SCHED_GRR)
-                return DEF_TIMESLICE;
+                return RR_TIMESLICE;
         else
                 return 0;
 }
@@ -136,6 +127,9 @@ static void prio_changed_grr(struct rq *rq, struct task_struct *p, int oldprio, 
 }
 
 static void switched_to_grr(struct rq *rq, struct task_struct *p, int running) {
+}
+
+static void switched_from_grr(struct rq *rq, struct task_struct *p) {
 }
 
 static void task_move_group_grr(struct task_struct *p, int on_rq)
