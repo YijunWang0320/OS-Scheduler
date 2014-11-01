@@ -77,13 +77,6 @@ static void set_curr_task_grr(struct rq *rq)
 /*TODO*/
 static void task_tick_grr(struct rq *rq, struct task_struct *curr, int queued)
 {
-	struct grr_rq *grr_rq;
-	struct sched_grr_entity *grr_se = &curr->grr_se;
-
-	for_each_sched_entity(grr_se) {
-		grr_rq = cfs_rq_of(grr_se);
-		entity_tick(grr_rq, grr_se, queued);
-	}
 }
 
 static void task_fork_grr(struct task_struct *p)
