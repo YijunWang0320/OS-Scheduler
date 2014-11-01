@@ -28,6 +28,17 @@ static void check_preempt_curr_grr(struct rq *rq, struct task_struct *p, int fla
 }
 static struct task_struct *pick_next_task_grr(struct rq *rq)
 {
+	struct sched_rt_entity *temp_next;
+	struct task_struct *next;
+
+	next = NULL;
+
+	if (!list_empty(&rq->grr.queue)) {
+		temp_next = list_entry(rq->grr.queue.next, struct sched_grr_entity, run_list);
+		next = container_of(temp_next, struct task_struct, grr);
+		next->se.exec_start = rq->clock;
+	}
+	return next;
 }
 static void put_prev_task_grr(struct rq *rq, struct task_struct *p)
 {
