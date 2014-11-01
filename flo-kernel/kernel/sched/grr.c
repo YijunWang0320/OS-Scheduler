@@ -129,6 +129,9 @@ static void prio_changed_grr(struct rq *rq, struct task_struct *p, int oldprio, 
 static void switched_to_grr(struct rq *rq, struct task_struct *p, int running) {
 }
 
+static void switched_from_grr(struct rq *rq, struct task_struct *p) {
+}
+
 static void task_move_group_grr(struct task_struct *p, int on_rq)
 {
 
