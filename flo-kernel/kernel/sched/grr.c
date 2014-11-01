@@ -9,6 +9,9 @@
 /*TODO*/
 static void enqueue_task_grr(struct rq *rq, struct task_struct *p, int wakeup)
 {
+	p->task_time_slice = RR_TIMESLICE;
+	list_add_tail( &p->other_rr_run_list, &rq->grr.queue);
+	rq->grr.nr_running++;
 
 }
 
@@ -62,7 +65,7 @@ static void requeue_task_grr(struct rq *rq, struct task_struct *p, int head)
 {
 }
 
-void init_grr_rq(struct grr_rq *grr_rq, struct rq *rq) {
+static void init_grr_rq(struct grr_rq *grr_rq, struct re *rq) {
 
 }
 
@@ -77,6 +80,13 @@ static void set_curr_task_grr(struct rq *rq)
 /*TODO*/
 static void task_tick_grr(struct rq *rq, struct task_struct *curr, int queued)
 {
+	struct grr_rq *grr_rq;
+	struct sched_grr_entity *grr_se = &curr->grr_se;
+
+	for_each_sched_entity(grr_se) {
+		grr_rq = cfs_rq_of(grr_se);
+		entity_tick(grr_rq, grr_se, queued);
+	}
 }
 
 static void task_fork_grr(struct task_struct *p)
@@ -100,12 +110,15 @@ unsigned int get_rr_interval_grr(struct task_struct *task)
  *          * Time slice is 0 for SCHED_FIFO tasks
  *                   */
         if (task->policy == SCHED_GRR)
-                return RR_TIMESLICE;
+                return DEF_TIMESLICE;
         else
                 return 0;
 }
 
 static void prio_changed_grr(struct rq *rq, struct task_struct *p, int oldprio, int running) {
+}
+
+static void switched_to_grr(struct rq *rq, struct task_struct *p, int running) {
 }
 
 static void task_move_group_grr(struct task_struct *p, int on_rq)
@@ -126,6 +139,8 @@ const struct sched_class grr_sched_class = {
 
 #ifdef CONFIG_SMP
 	.select_task_rq		= select_task_rq_grr,
+
+	.load_balance		= load_balance_grr,
 	.move_one_task		= move_one_task_grr,
 #endif
 
