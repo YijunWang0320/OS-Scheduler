@@ -17,6 +17,11 @@ static void enqueue_task_grr(struct rq *rq, struct task_struct *p, int wakeup)
 /*TODO*/
 static void dequeue_task_grr(struct rq *rq, struct task_struct *p, int sleep)
 {
+
+	update_curr_other_rr(rq);
+	list_del(&p->grr.run_list);
+	rq->grr.nr_running--;
+
 }
 static void yield_task_grr(struct rq *rq)
 {
