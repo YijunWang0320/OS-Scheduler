@@ -80,7 +80,7 @@ static void requeue_grr_entity(struct grr_rq *grr_rq, struct sched_grr_entity *g
 }
 
 void init_grr_rq(struct grr_rq *grr_rq, struct rq *rq) {
-
+	INIT_LIST_HEAD(&grr_rq->queue);
 }
 
 
