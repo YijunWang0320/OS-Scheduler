@@ -316,7 +316,9 @@ struct rt_rq {
 /*team10: define grr runqueue*/
 struct grr_rq 
 {
-
+	struct list_head queue;
+	unsigned long nr_running;
+	struct list_head *grr_load_balance_head,*grr_load_balance_curr;	
 };
 
 #ifdef CONFIG_SMP
