@@ -12,16 +12,16 @@ static void enqueue_task_grr(struct rq *rq, struct task_struct *p, int wakeup)
 	list_add_tail(&p->grr.run_list, &rq->grr.queue);
 	rq->grr.nr_running++;
 }
-
+static void yield_task_grr(struct rq *rq)
+{
+	printk("yield_task %ld\n",(unsigned long int)rq->curr);
+	requeue_task_grr(rq,rq->curr);
+}
 static void dequeue_task_grr(struct rq *rq, struct task_struct *p, int sleep)
 {
 	update_curr_other_rr(rq);
 	list_del(&p->grr.run_list);
 	rq->grr.nr_running--;
-}
-static void yield_task_grr(struct rq *rq)
-{
-	
 }
 static void check_preempt_curr_grr(struct rq *rq, struct task_struct *p, int flags)
 {
@@ -40,7 +40,6 @@ static struct task_struct *pick_next_task_grr(struct rq *rq)
 	}
 	return next;
 }
-/*TODO*/
 static void put_prev_task_grr(struct rq *rq, struct task_struct *p)
 {
 }
@@ -71,10 +70,12 @@ static int move_one_task_grr(struct rq *this_rq, int this_cpu, struct rq *busies
 
 static void requeue_grr_entity(struct grr_rq *grr_rq, struct sched_grr_entity *grr_se, int head)
 {
+
 }
 
 static void requeue_task_grr(struct rq *rq, struct task_struct *p, int head)
 {
+	list_move_tail(&p->grr.run_list,&rq->grr.queue);
 }
 
 static void init_grr_rq(struct grr_rq *grr_rq, struct re *rq) {
@@ -92,12 +93,16 @@ static void set_curr_task_grr(struct rq *rq)
 /*TODO*/
 static void task_tick_grr(struct rq *rq, struct task_struct *curr, int queued)
 {
-	struct grr_rq *grr_rq;
-	struct sched_grr_entity *grr_se = &curr->grr_se;
-
-	for_each_sched_entity(grr_se) {
-		grr_rq = cfs_rq_of(grr_se);
-		entity_tick(grr_rq, grr_se, queued);
+	if (RR_TIMESLICE == 0)
+	{
+		//This case we will do FIFO
+		return;
+	} else {
+		if (curr->grr.time_slice-- == 0) {
+			curr->grr.time_slice = RR_TIMESLICE;
+			set_tsk_need_resched(curr);
+			yield_task_grr(rq);
+		}
 	}
 }
 
