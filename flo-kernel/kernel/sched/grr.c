@@ -10,9 +10,8 @@
 static void enqueue_task_grr(struct rq *rq, struct task_struct *p, int wakeup)
 {
 	p->task_time_slice = RR_TIMESLICE;
-	list_add_tail( &p->other_rr_run_list, &rq->grr.queue);
+	list_add_tail( &p->grr.run_list, &rq->grr.queue);
 	rq->grr.nr_running++;
-
 }
 
 /*TODO*/
