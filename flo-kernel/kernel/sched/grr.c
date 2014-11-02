@@ -73,10 +73,10 @@ static int select_task_rq_grr(struct task_struct *p, int sd_flag, int flags)
 	 	
 		if(lowest == -1 || this_rq->grr.nr_running < lowest)
 		{
-			raw_spin_lock(&this_rq->grr.grr_runtime_lock);
+			raw_spin_lock(&rq->grr.grr_runtime_lock);
 			lowest = this_rq->grr.nr_running;
 			lowest_cpu = cpu;
-			raw_spin_unlock(&this_rq->grr.grr_runtime_lock);
+			raw_spin_unlock(&rq->grr.grr_runtime_lock);
 		}
 		
 	}
@@ -91,55 +91,82 @@ static int select_task_rq_grr(struct task_struct *p, int sd_flag, int flags)
 static unsigned long
 load_balance_grr(struct rq *this_rq)
 {
-	// int cpu,ret;
-	// struct rq *this_rq;
-	// struct grr_rq *lowest_grr_rq = NULL;
-	// struct grr_rq *highest_grr_rq = NULL;
-	// struct rq *highest_rq = NULL;
-	// struct rq *lowest_rq = NULL;
+	int cpu, ret, to_cpu;
+	struct rq *this_rq;
+	struct grr_rq *lowest_grr_rq = NULL;
+	struct grr_rq *highest_grr_rq = NULL;
+	struct rq *highest_rq = NULL;
+	struct rq *lowest_rq = NULL;
+	struct rq *from_task = NULL;
+	struct sched_grr_entity *from_entity;
 
-	// int highest = INT_MIN,lowest = INT_MAX, curr;
-	// ret = 0;
-	// for_each_possible_cpu(cpu) {
-	// 	this_rq = cpu_rq(cpu);
-	// 	if(this_rq == NULL)
-	// 		continue;
-	// 	curr = this_rq->grr.nr_running;
-	// 	if(curr >= highest) {
-	// 		highest = curr;
-	// 		highest_grr_rq = this_rq->grr;
-	// 		highest_rq = this_rq;
-	// 		continue;
-	// 	}
-	// 	if(curr < lowest) {
-	// 		lowest = curr;
-	// 		lowest_grr_rq = this_rq->grr;
-	// 		lowest_rq = this_rq;
-	// 		continue;
-	// 	}
-	// }
-	// if(highest - lowest <= 1) {
-	// 	return ret;
-	// }
-	// if (highest_grr_rq->nr_running == 1)
-	// {
-	// 	return ret;
-	// }
-	// struct list_head *pos = &highest->next->next;
-	// int to_cpu = lowest_rq->cpu;
+	int highest = INT_MIN,lowest = INT_MAX, curr;
+	ret = 0;
 
-	// struct sched_grr_entity *from_entity = list_entry(pos,struct sched_grr_entity,run_list);
-	// struct task_struct *from_task = container_of(from_entity,struct task_struct,grr);
+	for_each_possible_cpu(cpu) {
+		this_rq = cpu_rq(cpu);
+		if(this_rq == NULL)
+			continue;
+		raw_spin_lock(&this_rq->grr.grr_runtime_lock);
+		curr = this_rq->grr.nr_running;
+		if(curr <= highest && cur >= lowest) {
+			raw_spin_unlock(&this_rq->grr.grr_runtime_lock);
+			continue;
+		}
+		if(curr > highest) {
+			if(highest_grr_rq != NULL && highest_grr_rq != lowest_grr_rq) {
+				raw_spin_unlock(&highest_grr_rq->grr_runtime_lock);
+			}
+			highest = curr;
+			highest_grr_rq = this_rq->grr;
+			highest_rq = this_rq;
+		}
+		if(curr < lowest) {
+			if(lowest_grr_rq != NULL && highest_grr_rq != lowest_grr_rq) {
+				raw_spin_unlock(&lowest_grr_rq->grr_runtime_lock);
+			}
+			lowest = curr;
+			lowest_grr_rq = this_rq->grr;
+			lowest_rq = this_rq;
+		}
+	}
+	if(highest - lowest <= 1) {
+		ret = 0;
+		goto skip;
+	}
+	if (highest_grr_rq->nr_running == 1)
+	{
+		ret = 0;
+		goto skip;
+	}
+
+	/*find the to_cpu*/
+	to_cpu = lowest_rq->cpu;
+
+	/*find the 2nd task in the highest runqueue*/
+	if (!list_empty(&highest_rq->grr.queue)) {
+		sched_grr_entity = list_entry(rq->grr.queue.next.next, struct sched_grr_entity, run_list);
+		from_task = container_of(sched_grr_entity, struct task_struct, grr);
+	}
 	
-	// double_lock_balance(highest_rq, lowest_rq);
+	double_lock_balance(highest_rq, lowest_rq);
 
-	// deactivate_task(highest_grr_rq,from_task,0);
-	// set_task_cpu(from_task,to_cpu);
-	// activate_task(lowest_grr_rq,from_task,0);
+	deactivate_task(highest_grr_rq,from_task,0);
+	set_task_cpu(from_task,to_cpu);
+	activate_task(lowest_grr_rq,from_task,0);
 
-	// double_unlock_balance(highest_rq, lowest_rq);
+	double_unlock_balance(highest_rq, lowest_rq);
 
-	// return 1;
+	ret = 1;
+skip:
+	if (&highest_grr_rq != NULL) {
+		raw_spin_unlock(&highest_grr_rq->grr_runtime_lock);	
+	}
+	if (&lowest_grr_rq != NULL) {
+		raw_spin_unlock(&lowest_grr_rq->grr_runtime_lock);
+	}
+	
+	return ret;
 }
 
 static int move_one_task_grr(struct rq *this_rq, int this_cpu, struct rq *busiest, struct sched_domain *sd, enum cpu_idle_type idle)
