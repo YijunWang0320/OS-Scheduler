@@ -63,6 +63,8 @@ static int select_task_rq_grr(struct task_struct *p, int sd_flag, int flags)
 	for_each_possible_cpu(cpu)
 	{
 	 	this_rq = cpu_rq(cpu);
+	 	if (this_rq == NULL)
+	 		continue;
 		if(lowest == -1 || this_rq->grr.nr_running < lowest)
 		{
 			lowest = this_rq->grr.nr_running;
