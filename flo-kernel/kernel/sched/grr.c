@@ -9,21 +9,6 @@
 static void enqueue_task_grr(struct rq *rq, struct task_struct *p, int wakeup)
 {
 	p->grr.time_slice = RR_TIMESLICE;
-	struct rq *this_rq;
-	int lowest = -1;
-	int cpu;
-	int lowest_cpu;
-	for_each_possible_cpu(cpu)
-	{
-	 	this_rq = cpu_rq(cpu);
-		if(lowest == -1 || this_rq->grr.nr_running < lowest)
-		{
-			lowest = this_rq->grr.nr_running;
-			lowest_cpu = cpu;
-		}
-	}
-	
-	this_rq = cpu_rq(lowest_cpu);
 	list_add_tail(&p->grr.run_list, &this_rq->grr.queue);
 	rq->grr.nr_running++;
 	printk( "enqueue(): add %ld, n = %ld\n", (unsigned long int)p, rq->grr.nr_running);
@@ -70,7 +55,24 @@ static void put_prev_task_grr(struct rq *rq, struct task_struct *p)
 #ifdef CONFIG_SMP
 static int select_task_rq_grr(struct task_struct *p, int sd_flag, int flags)
 {
-	return task_cpu(p);
+	struct rq *this_rq;
+	int lowest = -1;
+	int cpu;
+	int lowest_cpu;
+	rcu_read_lock();
+	for_each_possible_cpu(cpu)
+	{
+	 	this_rq = cpu_rq(cpu);
+		if(lowest == -1 || this_rq->grr.nr_running < lowest)
+		{
+			lowest = this_rq->grr.nr_running;
+			lowest_cpu = cpu;
+		}
+	}
+	rcu_read_unlock();
+	printk( "select_task_rq_grr(): add %ld, lowest n = %ld\n", (unsigned long int)p, lowest);
+	
+	return lowest_cpu;
 }
 
 
