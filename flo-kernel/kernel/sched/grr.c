@@ -58,23 +58,25 @@ static int select_task_rq_grr(struct task_struct *p, int sd_flag, int flags)
 	struct rq *this_rq;
 	int lowest = -1;
 	int cpu;
-	int lowest_cpu;
-	rcu_read_lock();
-	for_each_possible_cpu(cpu)
+	int lowest_cpu = -1;
+
+	for_each_online_cpu(cpu)
 	{
 	 	this_rq = cpu_rq(cpu);
-	 	if (this_rq == NULL)
-	 		continue;
+
 		if(lowest == -1 || this_rq->grr.nr_running < lowest)
 		{
 			lowest = this_rq->grr.nr_running;
 			lowest_cpu = cpu;
 		}
 	}
-	rcu_read_unlock();
+
 	printk( "select_task_rq_grr(): add %ld, lowest n = %ld\n", (unsigned long int)p, lowest);
 	
-	return lowest_cpu;
+	if (lowest_cpu == -1)
+		return task_cpu(p);
+	else
+		return lowest_cpu;
 }
 
 
