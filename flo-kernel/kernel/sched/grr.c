@@ -59,20 +59,19 @@ static int select_task_rq_grr(struct task_struct *p, int sd_flag, int flags)
 	int lowest = -1;
 	int cpu;
 	int lowest_cpu = -1;
-	/*
+	
 	for_each_online_cpu(cpu)
 	{
 	 	this_rq = cpu_rq(cpu);
-	 	if(this_rq == NULL)
-	 		continue;
-
+	 	/*
 		if(lowest == -1 || this_rq->grr.nr_running < lowest)
 		{
 			lowest = this_rq->grr.nr_running;
 			lowest_cpu = cpu;
 		}
+		*/
 	}
-	*/
+	
 
 	printk( "select_task_rq_grr(): add %ld, lowest n = %ld\n", (unsigned long int)p, lowest);
 	
