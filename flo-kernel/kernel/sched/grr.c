@@ -107,15 +107,15 @@ load_balance_grr(void)
 		this_rq = cpu_rq(cpu);
 		if(this_rq == NULL)
 			continue;
-		raw_spin_lock(&this_rq->grr.grr_runtime_lock);
+		//raw_spin_lock(&this_rq->grr.grr_runtime_lock);
 		curr = this_rq->grr.nr_running;
 		if(curr <= highest && curr >= lowest) {
-			raw_spin_unlock(&this_rq->grr.grr_runtime_lock);
+			//raw_spin_unlock(&this_rq->grr.grr_runtime_lock);
 			continue;
 		}
 		if(curr > highest) {
 			if(highest_grr_rq != NULL && highest_grr_rq != lowest_grr_rq) {
-				raw_spin_unlock(&highest_grr_rq->grr_runtime_lock);
+				//raw_spin_unlock(&highest_grr_rq->grr_runtime_lock);
 			}
 			highest = curr;
 			highest_grr_rq = &this_rq->grr;
@@ -123,7 +123,7 @@ load_balance_grr(void)
 		}
 		if(curr < lowest) {
 			if(lowest_grr_rq != NULL && highest_grr_rq != lowest_grr_rq) {
-				raw_spin_unlock(&lowest_grr_rq->grr_runtime_lock);
+				//raw_spin_unlock(&lowest_grr_rq->grr_runtime_lock);
 			}
 			lowest = curr;
 			lowest_grr_rq = &this_rq->grr;
@@ -151,19 +151,19 @@ load_balance_grr(void)
 	
 	// double_lock_balance(highest_rq, lowest_rq);
 
-	// deactivate_task(highest_rq,from_task,0);
-	// set_task_cpu(from_task,to_cpu);
-	// activate_task(lowest_rq,from_task,0);
+	deactivate_task(highest_rq,from_task,0);
+	set_task_cpu(from_task,to_cpu);
+	activate_task(lowest_rq,from_task,0);
 
 	// double_unlock_balance(highest_rq, lowest_rq);
 
 	ret = 1;
 skip:
 	if (highest_grr_rq != NULL) {
-		raw_spin_unlock(&highest_grr_rq->grr_runtime_lock);	
+		//raw_spin_unlock(&highest_grr_rq->grr_runtime_lock);	
 	}
 	if (lowest_grr_rq != NULL) {
-		raw_spin_unlock(&lowest_grr_rq->grr_runtime_lock);
+		//raw_spin_unlock(&lowest_grr_rq->grr_runtime_lock);
 	}
 	
 	return ret;
