@@ -6907,7 +6907,7 @@ void __init sched_init_smp(void)
 	init_hrtick();
 
 	/*add our timer start*/
-	hrtimer_start(&load_balance_ktime,load_balance_timer,sched_grr_entity);
+	hrtimer_start(&load_balance_ktime,load_balance_timer,HRTIMER_MODE_REL);
 
 	/* Move init over to a non-isolated CPU */
 	if (set_cpus_allowed_ptr(current, non_isolated_cpus) < 0)

@@ -168,7 +168,7 @@ skip:
 	
 	return ret;
 }
-static enum hrtimer_restart do_load_balance_grr(struct hrtimer *timer) {
+enum hrtimer_restart do_load_balance_grr(struct hrtimer *timer) {
 	ktime_t load_balance_timer;
 	struct timespec timer_spec = {
 		.tv_nsec = 50000000,
