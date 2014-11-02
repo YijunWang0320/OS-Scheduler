@@ -164,7 +164,6 @@ const struct sched_class grr_sched_class = {
 
 #ifdef CONFIG_SMP
 	.select_task_rq		= select_task_rq_grr,
-	.move_one_task		= move_one_task_grr,
 #endif
 
 	.set_curr_task      = set_curr_task_grr,
