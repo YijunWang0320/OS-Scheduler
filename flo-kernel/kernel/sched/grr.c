@@ -145,7 +145,7 @@ load_balance_grr(void)
 
 	/*find the 2nd task in the highest runqueue*/
 	if (!list_empty(&highest_rq->grr.queue)) {
-		from_entity = list_entry(highest_rq->grr.queue.next.next, struct sched_grr_entity, run_list);
+		from_entity = list_entry((highest_rq->grr.queue.next)->next, struct sched_grr_entity, run_list);
 		from_task = container_of(from_entity, struct task_struct, grr);
 	}
 	
