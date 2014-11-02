@@ -1,0 +1,1 @@
+./update-kernel-flash.sh ../flo-kernel/arch/arm/boot/zImage
