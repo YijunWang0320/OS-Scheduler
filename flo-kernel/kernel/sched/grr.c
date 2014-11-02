@@ -9,18 +9,18 @@
 static void enqueue_task_grr(struct rq *rq, struct task_struct *p, int wakeup)
 {
 	p->grr.time_slice = RR_TIMESLICE;
-	spin_lock(&rq->grr.grr_runtime_lock);
+	raw_spin_lock(&rq->grr.grr_runtime_lock);
 	list_add_tail(&p->grr.run_list, &rq->grr.queue);
 	rq->grr.nr_running++;
-	spin_unlock(&rq->grr.grr_runtime_lock);
+	raw_spin_unlock(&rq->grr.grr_runtime_lock);
 	//printk( "enqueue(): add %ld, n = %ld\n", (unsigned long int)p, rq->grr.nr_running);
 }
 
 static void requeue_task_grr(struct rq *rq, struct task_struct *p)
 {
-	spin_lock(&rq->grr.grr_runtime_lock);
+	raw_spin_lock(&rq->grr.grr_runtime_lock);
 	list_move_tail(&p->grr.run_list,&rq->grr.queue);
-	spin_unlock(&rq->grr.grr_runtime_lock);
+	raw_spin_unlock(&rq->grr.grr_runtime_lock);
 }
 
 static void yield_task_grr(struct rq *rq)
@@ -31,10 +31,10 @@ static void yield_task_grr(struct rq *rq)
 static void dequeue_task_grr(struct rq *rq, struct task_struct *p, int sleep)
 {
 	/* update_curr_other_rr(rq); */
-	spin_lock(&rq->grr.grr_runtime_lock);
+	raw_spin_lock(&rq->grr.grr_runtime_lock);
 	list_del(&p->grr.run_list);
 	rq->grr.nr_running--;
-	spin_unlock(&rq->grr.grr_runtime_lock);
+	raw_spin_unlock(&rq->grr.grr_runtime_lock);
 	//printk( "deueue(): del %ld, n = %ld\n", (unsigned long int)p, rq->grr.nr_running);
 }
 static void check_preempt_curr_grr(struct rq *rq, struct task_struct *p, int flags)
@@ -46,13 +46,13 @@ static struct task_struct *pick_next_task_grr(struct rq *rq)
 	struct task_struct *next;
 
 	next = NULL;
-	spin_lock(&rq->grr.grr_runtime_lock);
+	raw_spin_lock(&rq->grr.grr_runtime_lock);
 	if (!list_empty(&rq->grr.queue)) {
 		temp_next = list_entry(rq->grr.queue.next, struct sched_grr_entity, run_list);
 		next = container_of(temp_next, struct task_struct, grr);
 		next->se.exec_start = rq->clock;
 	}
-	spin_unlock(&rq->grr.grr_runtime_lock);
+	raw_spin_unlock(&rq->grr.grr_runtime_lock);
 	return next;
 }
 static void put_prev_task_grr(struct rq *rq, struct task_struct *p)
@@ -73,10 +73,10 @@ static int select_task_rq_grr(struct task_struct *p, int sd_flag, int flags)
 	 	
 		if(lowest == -1 || this_rq->grr.nr_running < lowest)
 		{
-			spin_lock(&rq->grr.grr_runtime_lock);
+			raw_spin_lock(&this_rq->grr.grr_runtime_lock);
 			lowest = this_rq->grr.nr_running;
 			lowest_cpu = cpu;
-			spin_unlock(&rq->grr.grr_runtime_lock);
+			raw_spin_unlock(&this_rq->grr.grr_runtime_lock);
 		}
 		
 	}
