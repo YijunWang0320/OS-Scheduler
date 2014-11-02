@@ -11,7 +11,7 @@ static void enqueue_task_grr(struct rq *rq, struct task_struct *p, int wakeup)
 	p->grr.time_slice = RR_TIMESLICE;
 	list_add_tail(&p->grr.run_list, &rq->grr.queue);
 	rq->grr.nr_running++;
-	printk( "enqueue(): add %ld, n = %ld\n", (unsigned long int)p, rq->grr.nr_running);
+	//printk( "enqueue(): add %ld, n = %ld\n", (unsigned long int)p, rq->grr.nr_running);
 }
 
 static void requeue_task_grr(struct rq *rq, struct task_struct *p)
@@ -21,7 +21,7 @@ static void requeue_task_grr(struct rq *rq, struct task_struct *p)
 
 static void yield_task_grr(struct rq *rq)
 {
-	printk("yield_task %ld\n",(unsigned long int)rq->curr);
+	//printk("yield_task %ld\n",(unsigned long int)rq->curr);
 	requeue_task_grr(rq,rq->curr);
 }
 static void dequeue_task_grr(struct rq *rq, struct task_struct *p, int sleep)
@@ -29,7 +29,7 @@ static void dequeue_task_grr(struct rq *rq, struct task_struct *p, int sleep)
 	/* update_curr_other_rr(rq); */
 	list_del(&p->grr.run_list);
 	rq->grr.nr_running--;
-	printk( "deueue(): del %ld, n = %ld\n", (unsigned long int)p, rq->grr.nr_running);
+	//printk( "deueue(): del %ld, n = %ld\n", (unsigned long int)p, rq->grr.nr_running);
 }
 static void check_preempt_curr_grr(struct rq *rq, struct task_struct *p, int flags)
 {
@@ -59,11 +59,10 @@ static int select_task_rq_grr(struct task_struct *p, int sd_flag, int flags)
 	int lowest = -1;
 	int cpu;
 	int lowest_cpu = -1;
-	/*
+	
 	for_each_possible_cpu(cpu)
 	{
-		printk( "for each cpu: cpu value: %d \n", cpu);
-	 	//this_rq = cpu_rq(cpu);
+		this_rq = cpu_rq(cpu);
 	 	
 		if(lowest == -1 || this_rq->grr.nr_running < lowest)
 		{
@@ -72,9 +71,6 @@ static int select_task_rq_grr(struct task_struct *p, int sd_flag, int flags)
 		}
 		
 	}
-	*/
-
-	printk( "select_task_rq_grr(): add %ld, lowest n = %d\n", (unsigned long int)p, lowest);
 	
 	if (lowest_cpu == -1)
 		return task_cpu(p);
