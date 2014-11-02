@@ -149,13 +149,13 @@ load_balance_grr(void)
 		from_task = container_of(from_entity, struct task_struct, grr);
 	}
 	
-	double_lock_balance(highest_rq, lowest_rq);
+	// double_lock_balance(highest_rq, lowest_rq);
 
-	deactivate_task(highest_rq,from_task,0);
-	set_task_cpu(from_task,to_cpu);
-	activate_task(lowest_rq,from_task,0);
+	// deactivate_task(highest_rq,from_task,0);
+	// set_task_cpu(from_task,to_cpu);
+	// activate_task(lowest_rq,from_task,0);
 
-	double_unlock_balance(highest_rq, lowest_rq);
+	// double_unlock_balance(highest_rq, lowest_rq);
 
 	ret = 1;
 skip:
@@ -178,7 +178,7 @@ enum hrtimer_restart do_load_balance_grr(struct hrtimer *timer) {
 	
 #ifdef CONFIG_SMP
 	printk("SMP: every 0.5s\n");
-	//load_balance_grr();
+	load_balance_grr();
 #endif
 	ktime_t now = timer->base->get_time();
 	hrtimer_forward(timer,now,load_balance_timer);
