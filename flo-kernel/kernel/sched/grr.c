@@ -177,8 +177,8 @@ enum hrtimer_restart do_load_balance_grr(struct hrtimer *timer) {
 	load_balance_timer = timespec_to_ktime(timer_spec);
 	
 #ifdef CONFIG_SMP
-	// printk("SMP: every 0.5s\n");
-	load_balance_grr();
+	printk("SMP: every 0.5s\n");
+	//load_balance_grr();
 #endif
 	ktime_t now = timer->base->get_time();
 	hrtimer_forward(timer,now,load_balance_timer);
