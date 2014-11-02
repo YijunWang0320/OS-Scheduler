@@ -10,15 +10,15 @@ static void enqueue_task_grr(struct rq *rq, struct task_struct *p, int wakeup)
 {
 	p->grr.time_slice = RR_TIMESLICE;
 	struct rq *this_rq;
-	int lowerst = -1;
+	int lowest = -1;
 	int cpu;
 	int lowest_cpu;
 	for_each_possible_cpu(cpu)
 	{
 		this_rq = cpu_rq(cpu);
-		if(lowest == -1 || this_rq->grr->nr_running < lowerst)
+		if(lowest == -1 || this_rq->grr.nr_running < lowerst)
 		{
-			lowerst = this_rq->grr->nr_running;
+			lowerst = this_rq->grr.nr_running;
 			lowest_cpu = cpu;
 		}
 	}
