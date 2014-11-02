@@ -6909,9 +6909,9 @@ void __init sched_init_smp(void)
 
 	/*add our timer start*/
 	for_each_possible_cpu(cpu) {
-		hrtimer_init(per_cpu(load_balance_ktime,cpu),CLOCK_MONOTONIC,HRTIMER_MODE_REL);
-		per_cpu(load_balance_ktime,cpu)->function = do_load_balance_grr;
-		hrtimer_start(per_cpu(load_balance_ktime,cpu),load_balance_timer,HRTIMER_MODE_REL);
+		hrtimer_init(&per_cpu(load_balance_ktime,cpu),CLOCK_MONOTONIC,HRTIMER_MODE_REL);
+		per_cpu(load_balance_ktime,cpu).function = do_load_balance_grr;
+		hrtimer_start(&per_cpu(load_balance_ktime,cpu),load_balance_timer,HRTIMER_MODE_REL);
 	}
 	/* Move init over to a non-isolated CPU */
 	if (set_cpus_allowed_ptr(current, non_isolated_cpus) < 0)
