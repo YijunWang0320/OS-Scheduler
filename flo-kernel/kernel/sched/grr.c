@@ -62,7 +62,7 @@ static int select_task_rq_grr(struct task_struct *p, int sd_flag, int flags)
 	
 	for_each_online_cpu(cpu)
 	{
-	 	this_rq = cpu_rq(cpu);
+	 	//this_rq = cpu_rq(cpu);
 	 	/*
 		if(lowest == -1 || this_rq->grr.nr_running < lowest)
 		{
