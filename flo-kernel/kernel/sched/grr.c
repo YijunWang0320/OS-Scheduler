@@ -16,15 +16,15 @@ static void enqueue_task_grr(struct rq *rq, struct task_struct *p, int wakeup)
 	for_each_possible_cpu(cpu)
 	{
 	 	this_rq = cpu_rq(cpu);
-	// 	if(lowest == -1 || this_rq->grr.nr_running < lowest)
-	// 	{
-	// 		lowest = this_rq->grr.nr_running;
-	// 		lowest_cpu = cpu;
-	// 	}
+		if(lowest == -1 || this_rq->grr.nr_running < lowest)
+		{
+			lowest = this_rq->grr.nr_running;
+			lowest_cpu = cpu;
+		}
 	}
 	
 	/*rq = cpu_rq(lowest_cpu);*/
-	list_add_tail(&p->grr.run_list, &rq->grr.queue);
+	list_add_tail(&p->grr.run_list, &this_rq->grr.queue);
 	rq->grr.nr_running++;
 	printk( "enqueue(): add %ld, n = %ld\n", (unsigned long int)p, rq->grr.nr_running);
 }
