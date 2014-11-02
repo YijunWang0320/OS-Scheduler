@@ -16,9 +16,9 @@ static void enqueue_task_grr(struct rq *rq, struct task_struct *p, int wakeup)
 	for_each_possible_cpu(cpu)
 	{
 		this_rq = cpu_rq(cpu);
-		if(lowest == -1 || this_rq->grr.nr_running < lowerst)
+		if(lowest == -1 || this_rq->grr.nr_running < lowest)
 		{
-			lowerst = this_rq->grr.nr_running;
+			lowest = this_rq->grr.nr_running;
 			lowest_cpu = cpu;
 		}
 	}
