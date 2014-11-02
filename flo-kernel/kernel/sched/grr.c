@@ -171,12 +171,13 @@ skip:
 enum hrtimer_restart do_load_balance_grr(struct hrtimer *timer) {
 	ktime_t load_balance_timer;
 	struct timespec timer_spec = {
-		.tv_nsec = 50000000,
+		.tv_nsec = 500000000,
 		.tv_sec = 0
 	};
 	load_balance_timer = timespec_to_ktime(timer_spec);
-	printk("every 5ms\n");
+	
 #ifdef CONFIG_SMP
+	printk("SMP: every 0.5s\n");
 	//load_balance_grr();
 #endif
 	ktime_t now = timer->base->get_time();
