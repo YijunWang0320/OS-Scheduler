@@ -6,21 +6,6 @@
 
 #include <linux/slab.h>
 
-static enum hrtimer_restart do_load_balance_grr(struct hrtimer *timer) {
-	ktime_t load_balance_timer;
-	struct timespec timer_spec = {
-		.tv_nsec = 50000000;
-		.tv_sec = 0;
-	};
-	load_balance_timer = timespec_to_ktime(timer_spec);
-	printk("every 5ms\n");
-#ifdef CONFIG_SMP
-	load_balance_grr();
-#endif
-	ktime_t now = timer->base->get_time();
-	hrtimer_forward(timer,now,load_balance_timer);
-	return HRTIMER_RESTART;
-}
 static void enqueue_task_grr(struct rq *rq, struct task_struct *p, int wakeup)
 {
 	p->grr.time_slice = RR_TIMESLICE;
@@ -183,7 +168,21 @@ skip:
 	
 	return ret;
 }
-
+static enum hrtimer_restart do_load_balance_grr(struct hrtimer *timer) {
+	ktime_t load_balance_timer;
+	struct timespec timer_spec = {
+		.tv_nsec = 50000000,
+		.tv_sec = 0
+	};
+	load_balance_timer = timespec_to_ktime(timer_spec);
+	printk("every 5ms\n");
+#ifdef CONFIG_SMP
+	load_balance_grr();
+#endif
+	ktime_t now = timer->base->get_time();
+	hrtimer_forward(timer,now,load_balance_timer);
+	return HRTIMER_RESTART;
+}
 static int move_one_task_grr(struct rq *this_rq, int this_cpu, struct rq *busiest, struct sched_domain *sd, enum cpu_idle_type idle)
 {
         return 0;

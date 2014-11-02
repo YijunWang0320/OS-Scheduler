@@ -88,6 +88,7 @@
 #include <trace/events/sched.h>
 
 ATOMIC_NOTIFIER_HEAD(migration_notifier_head);
+static struct hrtimer load_balance_ktime;
 
 void start_bandwidth_timer(struct hrtimer *period_timer, ktime_t period)
 {
@@ -6876,6 +6877,13 @@ static int cpuset_cpu_inactive(struct notifier_block *nfb, unsigned long action,
 
 void __init sched_init_smp(void)
 {
+	ktime_t load_balance_timer;
+	struct timespec timer_spec = {
+		.tv_nsec = 50000000,
+		.tv_sec = 0
+	};
+	load_balance_timer = timespec_to_ktime(timer_spec);
+
 	cpumask_var_t non_isolated_cpus;
 
 	alloc_cpumask_var(&non_isolated_cpus, GFP_KERNEL);
@@ -6897,6 +6905,9 @@ void __init sched_init_smp(void)
 	hotcpu_notifier(update_runtime, 0);
 
 	init_hrtick();
+
+	/*add our timer start*/
+	hrtimer_start(&load_balance_ktime,load_balance_timer,sched_grr_entity);
 
 	/* Move init over to a non-isolated CPU */
 	if (set_cpus_allowed_ptr(current, non_isolated_cpus) < 0)
@@ -6971,6 +6982,9 @@ void __init sched_init(void)
 
 #ifdef CONFIG_SMP
 	init_defrootdomain();
+	/*our timer init*/
+	hrtimer_init(&load_balance_ktime,CLOCK_MONOTONIC,HRTIMER_MODE_REL);
+	load_balance_ktime.function = do_load_balance_grr;
 #endif
 
 	init_rt_bandwidth(&def_rt_bandwidth,
