@@ -91,6 +91,12 @@ ATOMIC_NOTIFIER_HEAD(migration_notifier_head);
 
 static DEFINE_PER_CPU(struct hrtimer,load_balance_ktime);
 
+#define FOREGROUND 1
+#define BACKGROUND 2
+SYSCALL_DEFINE2(sched_set_CPUgroup, int, numCPU, int, group)
+{
+	return 0;
+}
 
 void start_bandwidth_timer(struct hrtimer *period_timer, ktime_t period)
 {
